@@ -8,6 +8,28 @@
     tools:context=".ui.dashboard.DashboardFragment">
 
 
+    <EditText
+        android:id="@+id/enderecoItemEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Endereço"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_select_image" />
+
+    <EditText
+        android:id="@+id/nascimentoItemEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:hint="Data de Nascimento"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_select_image" />
+
     <TextView
         android:id="@+id/text_dashboard"
         android:layout_width="wrap_content"
@@ -15,7 +37,7 @@
         android:layout_marginTop="32dp"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:text="Cadastro de ..."
+        android:text="Cadastro de Clientes"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,23 +67,26 @@
 
 
     <EditText
-        android:id="@+id/enderecoItemEditText"
+        android:id="@+id/generoItemEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Endereço"
+        android:layout_marginTop="68dp"
+        android:hint="Gênero"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_select_image" />
-
 
     <Button
         android:id="@+id/salvarItemButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="76dp"
         android:text="Salvar"
-        app:layout_constraintTop_toBottomOf="@id/enderecoItemEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/generoItemEditText" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -33,6 +33,9 @@ class DashboardFragment : Fragment() {
     private lateinit var itemImageView: ImageView
     private var imageUri: Uri? = null
 
+    private lateinit var generoEditText: EditText
+
+    private lateinit var nascimentoEditText: EditText
 
     //TODO("Declare aqui as outras variaveis do tipo EditText que foram inseridas no layout")
     private lateinit var salvarButton: Button
@@ -67,6 +70,8 @@ class DashboardFragment : Fragment() {
         salvarButton = view.findViewById(R.id.salvarItemButton)
         selectImageButton = view.findViewById(R.id.button_select_image)
         enderecoEditText = view.findViewById(R.id.enderecoItemEditText)
+        generoEditText= view.findViewById(R.id.generoItemEditText)
+        nascimentoEditText= view.findViewById(R.id.nascimentoItemEditText)
         //TODO("Capture aqui os outro campos que foram inseridos no layout. Por exemplo, ate
         // o momento so foi capturado o endereco (EditText)")
 
@@ -98,8 +103,10 @@ class DashboardFragment : Fragment() {
     private fun salvarItem() {
         //TODO("Capture aqui o conteudo que esta nos outros editTexts que foram criados")
         val endereco = enderecoEditText.text.toString().trim()
+        val genero = generoEditText.text.toString().trim()
+        val nascimento = nascimentoEditText.text.toString().trim()
 
-        if (endereco.isEmpty() || imageUri == null) {
+        if (endereco.isEmpty() || genero.isEmpty() || nascimento.isEmpty() ||  imageUri == null) {
             Toast.makeText(context, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT)
                 .show()
             return
@@ -117,9 +124,11 @@ class DashboardFragment : Fragment() {
             if (bytes != null) {
                 val base64Image = Base64.encodeToString(bytes, Base64.DEFAULT)
                 val endereco = enderecoEditText.text.toString().trim()
+                val genero = generoEditText.text.toString().trim()
+                val nascimento = nascimentoEditText.text.toString().trim()
                 //TODO("Capture aqui o conteudo que esta nos outros editTexts que foram criados")
 
-                val item = Item(endereco, base64Image)
+                val item = Item(endereco, base64Image, null, genero, nascimento)
 
                 saveItemIntoDatabase(item)
             }
