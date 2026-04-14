@@ -8,72 +8,56 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.StorageReference
 import com.ifpr.androidapptemplate.R
 import com.ifpr.androidapptemplate.baseclasses.Item
-import com.ifpr.androidapptemplate.databinding.FragmentDashboardBinding
-
 
 class DashboardFragment : Fragment() {
 
-    private var _binding: FragmentDashboardBinding? = null
-
+    private lateinit var nomeEditText: EditText
     private lateinit var enderecoEditText: EditText
-    private lateinit var itemImageView: ImageView
-    private var imageUri: Uri? = null
-
     private lateinit var generoEditText: EditText
-
     private lateinit var nascimentoEditText: EditText
+    private lateinit var dataEditText: EditText
+    private lateinit var horarioEditText: EditText
+    private lateinit var servicoEditText: EditText
 
-    //TODO("Declare aqui as outras variaveis do tipo EditText que foram inseridas no layout")
+    private lateinit var itemImageView: ImageView
     private lateinit var salvarButton: Button
     private lateinit var selectImageButton: Button
+
+    private var imageUri: Uri? = null
+
     private lateinit var databaseReference: DatabaseReference
-    private lateinit var storageReference: StorageReference
     private lateinit var auth: FirebaseAuth
 
     companion object {
         private const val PICK_IMAGE_REQUEST = 1
     }
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        val dashboardViewModel = ViewModelProvider(this).get(DashboardViewModel::class.java)
-
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val textView: TextView = binding.textDashboard
-        dashboardViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
 
         val view = inflater.inflate(R.layout.fragment_dashboard, container, false)
+
+        // 🔥 CAPTURAR CAMPOS
+        nomeEditText = view.findViewById(R.id.nomeItemEditText)
+        enderecoEditText = view.findViewById(R.id.enderecoItemEditText)
+        generoEditText = view.findViewById(R.id.generoItemEditText)
+        nascimentoEditText = view.findViewById(R.id.nascimentoItemEditText)
+        dataEditText = view.findViewById(R.id.dataItemEditText)
+        horarioEditText = view.findViewById(R.id.horarioItemEditText)
+        servicoEditText = view.findViewById(R.id.servicoItemEditText)
+
         itemImageView = view.findViewById(R.id.image_item)
         salvarButton = view.findViewById(R.id.salvarItemButton)
         selectImageButton = view.findViewById(R.id.button_select_image)
-        enderecoEditText = view.findViewById(R.id.enderecoItemEditText)
-        generoEditText= view.findViewById(R.id.generoItemEditText)
-        nascimentoEditText= view.findViewById(R.id.nascimentoItemEditText)
-        //TODO("Capture aqui os outro campos que foram inseridos no layout. Por exemplo, ate
-        // o momento so foi capturado o endereco (EditText)")
 
         auth = FirebaseAuth.getInstance()
 
@@ -88,11 +72,6 @@ class DashboardFragment : Fragment() {
         return view
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     private fun openFileChooser() {
         val intent = Intent()
         intent.type = "image/*"
@@ -101,46 +80,68 @@ class DashboardFragment : Fragment() {
     }
 
     private fun salvarItem() {
-        //TODO("Capture aqui o conteudo que esta nos outros editTexts que foram criados")
+
+        val nome = nomeEditText.text.toString().trim()
         val endereco = enderecoEditText.text.toString().trim()
         val genero = generoEditText.text.toString().trim()
         val nascimento = nascimentoEditText.text.toString().trim()
+        val data = dataEditText.text.toString().trim()
+        val horario = horarioEditText.text.toString().trim()
+        val servico = servicoEditText.text.toString().trim()
 
-        if (endereco.isEmpty() || genero.isEmpty() || nascimento.isEmpty() ||  imageUri == null) {
-            Toast.makeText(context, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT)
-                .show()
+        if (nome.isEmpty() || endereco.isEmpty() || genero.isEmpty() ||
+            nascimento.isEmpty() || data.isEmpty() || horario.isEmpty() ||
+            servico.isEmpty() || imageUri == null
+        ) {
+            Toast.makeText(context, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
             return
         }
-        uploadImageToFirestore()
+
+        uploadImageToFirebase(nome, endereco, genero, nascimento, data, horario, servico)
     }
 
+    private fun uploadImageToFirebase(
+        nome: String,
+        endereco: String,
+        genero: String,
+        nascimento: String,
+        data: String,
+        horario: String,
+        servico: String
+    ) {
 
-    private fun uploadImageToFirestore() {
-        if (imageUri != null) {
-            val inputStream = context?.contentResolver?.openInputStream(imageUri!!)
-            val bytes = inputStream?.readBytes()
-            inputStream?.close()
+        val inputStream = context?.contentResolver?.openInputStream(imageUri!!)
+        val bytes = inputStream?.readBytes()
+        inputStream?.close()
 
-            if (bytes != null) {
-                val base64Image = Base64.encodeToString(bytes, Base64.DEFAULT)
-                val endereco = enderecoEditText.text.toString().trim()
-                val genero = generoEditText.text.toString().trim()
-                val nascimento = nascimentoEditText.text.toString().trim()
-                //TODO("Capture aqui o conteudo que esta nos outros editTexts que foram criados")
+        if (bytes != null) {
 
-                val item = Item(endereco, base64Image, null, genero, nascimento)
+            val base64Image = Base64.encodeToString(bytes, Base64.DEFAULT)
 
-                saveItemIntoDatabase(item)
-            }
+            // 🔥 ORDEM CORRETA DO ITEM
+            val item = Item(
+                nome,
+                endereco,
+                base64Image,
+                null,
+                genero,
+                nascimento,
+                data,
+                horario,
+                servico
+            )
+
+            saveItemIntoDatabase(item)
         }
     }
-
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK
-            && data != null && data.data != null
+
+        if (requestCode == PICK_IMAGE_REQUEST &&
+            resultCode == Activity.RESULT_OK &&
+            data != null &&
+            data.data != null
         ) {
             imageUri = data.data
             Glide.with(this).load(imageUri).into(itemImageView)
@@ -148,23 +149,20 @@ class DashboardFragment : Fragment() {
     }
 
     private fun saveItemIntoDatabase(item: Item) {
-        //TODO("Altere a raiz que sera criada no seu banco de dados do realtime database.
-        // Renomeie a raiz itens")
+
         databaseReference = FirebaseDatabase.getInstance().getReference("itens")
 
-        // Cria uma chave unica para o novo item
         val itemId = databaseReference.push().key
+
         if (itemId != null) {
             databaseReference.child(auth.uid.toString()).child(itemId).setValue(item)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Item cadastrado com sucesso!", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(context, "Item salvo com sucesso!", Toast.LENGTH_SHORT).show()
                     requireActivity().supportFragmentManager.popBackStack()
-                }.addOnFailureListener {
-                    Toast.makeText(context, "Falha ao cadastrar o item", Toast.LENGTH_SHORT).show()
                 }
-        } else {
-            Toast.makeText(context, "Erro ao gerar o ID do item", Toast.LENGTH_SHORT).show()
+                .addOnFailureListener {
+                    Toast.makeText(context, "Erro ao salvar item", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 }
