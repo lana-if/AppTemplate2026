@@ -4,33 +4,35 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="12dp"
-    card_view:cardElevation="6dp"
-    android:layout_margin="8dp">
+    android:layout_margin="10dp"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="14dp">
 
         <!-- IMAGEM -->
         <ImageView
             android:id="@+id/item_image"
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:scaleType="centerCrop"
-            android:layout_marginBottom="10dp" />
+            android:layout_height="190dp"
+            android:layout_marginBottom="12dp"
+            android:background="#EEEEEE"
+            android:scaleType="centerCrop" />
 
-        <!-- NOME (DESTAQUE) -->
+        <!-- NOME -->
         <TextView
             android:id="@+id/item_nome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nome"
+            android:textColor="#212121"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="6dp" />
+            android:layout_marginBottom="8dp" />
 
         <!-- SERVIÇO -->
         <TextView
@@ -38,8 +40,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Serviço"
-            android:textSize="14sp"
-            android:layout_marginBottom="2dp" />
+            android:textColor="#424242"
+            android:textSize="15sp"
+            android:layout_marginBottom="4dp" />
 
         <!-- DATA -->
         <TextView
@@ -47,8 +50,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Data"
-            android:textSize="14sp"
-            android:layout_marginBottom="2dp" />
+            android:textColor="#424242"
+            android:textSize="15sp"
+            android:layout_marginBottom="4dp" />
 
         <!-- HORÁRIO -->
         <TextView
@@ -56,8 +60,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Horário"
-            android:textSize="14sp"
-            android:layout_marginBottom="6dp" />
+            android:textColor="#424242"
+            android:textSize="15sp"
+            android:layout_marginBottom="8dp" />
 
         <!-- ENDEREÇO -->
         <TextView
@@ -65,9 +70,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Endereço"
+            android:textColor="#5E35B1"
+            android:textSize="15sp"
             android:textStyle="bold"
-            android:textSize="14sp"
-            android:layout_marginBottom="2dp" />
+            android:layout_marginBottom="4dp" />
 
         <!-- GÊNERO -->
         <TextView
@@ -75,8 +81,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Gênero"
-            android:textSize="14sp"
-            android:layout_marginBottom="2dp" />
+            android:textColor="#424242"
+            android:textSize="15sp"
+            android:layout_marginBottom="4dp" />
 
         <!-- NASCIMENTO -->
         <TextView
@@ -84,8 +91,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Nascimento"
-            android:textSize="14sp"
-            android:layout_marginBottom="4dp" />
+            android:textColor="#424242"
+            android:textSize="15sp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- BOTÃO MAPS -->
+        <Button
+            android:id="@+id/buttonMaps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📍 Abrir no Maps"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#6200EE"
+            android:padding="10dp"
+            android:layout_marginTop="6dp" />
 
     </LinearLayout>
 

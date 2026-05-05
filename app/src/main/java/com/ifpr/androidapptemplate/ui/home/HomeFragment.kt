@@ -1,8 +1,9 @@
 package com.ifpr.androidapptemplate.ui.home
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,19 +18,13 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Looper
 import androidx.core.app.ActivityCompat
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.SwitchCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,14 +32,11 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 import com.ifpr.androidapptemplate.R
 import com.ifpr.androidapptemplate.baseclasses.Item
-import com.ifpr.androidapptemplate.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
 
-
-    private var _binding: FragmentHomeBinding? = null
-
     private lateinit var currentAddressTextView: TextView
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
@@ -53,52 +45,58 @@ class HomeFragment : Fragment() {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        val containerLayout = view.findViewById<LinearLayout>(R.id.itemContainer)
+        val containerLayout =
+            view.findViewById<LinearLayout>(R.id.itemContainer)
+
         carregarItensMarketplace(containerLayout)
 
         inicializaGerenciamentoLocalizacao(view)
 
-
         return view
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
     }
 
     private fun inicializaGerenciamentoLocalizacao(view: View) {
-        currentAddressTextView = view.findViewById(R.id.currentAddressTextView)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        currentAddressTextView =
+            view.findViewById(R.id.currentAddressTextView)
 
-        if (ActivityCompat.checkSelfPermission(
+        fusedLocationClient =
+            LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        if (
+            ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            ) != PackageManager.PERMISSION_GRANTED
+            &&
+            ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+
             requestLocationPermission()
+
         } else {
+
             getCurrentLocation()
         }
     }
 
     private fun requestLocationPermission() {
+
         requestPermissions(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -113,11 +111,25 @@ class HomeFragment : Fragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        super.onRequestPermissionsResult(
+            requestCode,
+            permissions,
+            grantResults
+        )
+
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            if (
+                grantResults.isNotEmpty()
+                &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED
+            ) {
+
                 getCurrentLocation()
+
             } else {
+
                 Snackbar.make(
                     requireView(),
                     "Permission denied. Cannot access location.",
@@ -128,10 +140,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun getCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(
+
+        if (
+            ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            ) != PackageManager.PERMISSION_GRANTED
+            &&
+            ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
@@ -140,17 +156,20 @@ class HomeFragment : Fragment() {
         }
 
         locationCallback = object : LocationCallback() {
+
             override fun onLocationResult(locationResult: LocationResult) {
+
                 locationResult.lastLocation?.let { location ->
+
                     displayAddress(location)
                 }
             }
         }
 
         locationRequest = LocationRequest.create().apply {
-            interval = 30000 // Intervalo em milissegundos para atualizacoes de localizacao
-            fastestInterval =
-                30000 // O menor intervalo de tempo para receber atualizacoes de localizacao
+
+            interval = 30000
+            fastestInterval = 30000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
@@ -162,86 +181,199 @@ class HomeFragment : Fragment() {
     }
 
     private fun displayAddress(location: Location) {
-        val geocoder = Geocoder(requireContext(), Locale.getDefault())
-        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+
+        val geocoder =
+            Geocoder(requireContext(), Locale.getDefault())
+
+        val addresses =
+            geocoder.getFromLocation(
+                location.latitude,
+                location.longitude,
+                1
+            )
 
         CoroutineScope(Dispatchers.IO).launch {
+
             try {
-                val address = addresses?.firstOrNull()?.getAddressLine(0) ?: "Address not found"
+
+                val address =
+                    addresses?.firstOrNull()?.getAddressLine(0)
+                        ?: "Address not found"
+
                 withContext(Dispatchers.Main) {
+
                     currentAddressTextView.text = address
                 }
+
             } catch (e: Exception) {
+
                 withContext(Dispatchers.Main) {
-                    currentAddressTextView.text = "Error: ${e.message}"
+
+                    currentAddressTextView.text =
+                        "Error: ${e.message}"
                 }
             }
         }
     }
 
     fun carregarItensMarketplace(container: LinearLayout) {
-        val databaseRef = FirebaseDatabase.getInstance().getReference("itens")
 
-        databaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        val databaseRef =
+            FirebaseDatabase.getInstance().getReference("itens")
 
-            override fun onDataChange(snapshot: DataSnapshot) {
+        databaseRef.addListenerForSingleValueEvent(
+            object : ValueEventListener {
 
-                container.removeAllViews()
+                override fun onDataChange(snapshot: DataSnapshot) {
 
-                for (userSnapshot in snapshot.children) {
-                    for (itemSnapshot in userSnapshot.children) {
+                    container.removeAllViews()
 
-                        val item = itemSnapshot.getValue(Item::class.java) ?: continue
+                    for (userSnapshot in snapshot.children) {
 
-                        val itemView = LayoutInflater.from(container.context)
-                            .inflate(R.layout.item_template, container, false)
+                        for (itemSnapshot in userSnapshot.children) {
 
-                        // 🔥 COMPONENTES
-                        val imageView = itemView.findViewById<ImageView>(R.id.item_image)
+                            val item =
+                                itemSnapshot.getValue(Item::class.java)
+                                    ?: continue
 
-                        val nomeText = itemView.findViewById<TextView>(R.id.item_nome)
-                        val servicoText = itemView.findViewById<TextView>(R.id.item_servico)
-                        val dataText = itemView.findViewById<TextView>(R.id.item_data)
-                        val horarioText = itemView.findViewById<TextView>(R.id.item_horario)
+                            val itemView =
+                                LayoutInflater.from(container.context)
+                                    .inflate(
+                                        R.layout.item_template,
+                                        container,
+                                        false
+                                    )
 
-                        val enderecoText = itemView.findViewById<TextView>(R.id.item_endereco)
-                        val generoText = itemView.findViewById<TextView>(R.id.item_genero)
-                        val nascimentoText = itemView.findViewById<TextView>(R.id.item_nascimento)
+                            // COMPONENTES
+                            val imageView =
+                                itemView.findViewById<ImageView>(R.id.item_image)
 
-                        // 📝 DADOS
-                        nomeText.text = "👤 ${item.nome ?: "Não informado"}"
-                        servicoText.text = "💼 Serviço: ${item.servico ?: "Não informado"}"
-                        dataText.text = "📅 Data: ${item.data ?: "Não informado"}"
-                        horarioText.text = "⏰ Horário: ${item.horario ?: "Não informado"}"
+                            val nomeText =
+                                itemView.findViewById<TextView>(R.id.item_nome)
 
-                        enderecoText.text = "📍 ${item.endereco ?: "Não informado"}"
-                        generoText.text = "👤 Gênero: ${item.genero ?: "Não informado"}"
-                        nascimentoText.text = "🎂 Nascimento: ${item.nascimento ?: "Não informado"}"
+                            val servicoText =
+                                itemView.findViewById<TextView>(R.id.item_servico)
 
-                        // 🖼️ IMAGEM
-                        if (!item.imageUrl.isNullOrEmpty()) {
-                            Glide.with(container.context)
-                                .load(item.imageUrl)
-                                .into(imageView)
-                        } else if (!item.base64Image.isNullOrEmpty()) {
-                            try {
-                                val bytes = Base64.decode(item.base64Image, Base64.DEFAULT)
-                                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                                imageView.setImageBitmap(bitmap)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
+                            val dataText =
+                                itemView.findViewById<TextView>(R.id.item_data)
+
+                            val horarioText =
+                                itemView.findViewById<TextView>(R.id.item_horario)
+
+                            val enderecoText =
+                                itemView.findViewById<TextView>(R.id.item_endereco)
+
+                            val generoText =
+                                itemView.findViewById<TextView>(R.id.item_genero)
+
+                            val nascimentoText =
+                                itemView.findViewById<TextView>(R.id.item_nascimento)
+
+                            val mapsButton =
+                                itemView.findViewById<Button>(R.id.buttonMaps)
+
+                            // DADOS
+                            nomeText.text =
+                                "👤 ${item.nome ?: "Não informado"}"
+
+                            servicoText.text =
+                                "💼 Serviço: ${item.servico ?: "Não informado"}"
+
+                            dataText.text =
+                                "📅 Data: ${item.data ?: "Não informado"}"
+
+                            horarioText.text =
+                                "⏰ Horário: ${item.horario ?: "Não informado"}"
+
+                            enderecoText.text =
+                                "📍 ${item.endereco ?: "Não informado"}"
+
+                            generoText.text =
+                                "👤 Gênero: ${item.genero ?: "Não informado"}"
+
+                            nascimentoText.text =
+                                "🎂 Nascimento: ${item.nascimento ?: "Não informado"}"
+
+                            // BOTÃO MAPS
+                            mapsButton.setOnClickListener {
+
+                                val endereco = item.endereco
+
+                                if (!endereco.isNullOrEmpty()) {
+
+                                    val gmmIntentUri = Uri.parse(
+                                        "geo:0,0?q=${Uri.encode(endereco)}"
+                                    )
+
+                                    val mapIntent =
+                                        Intent(
+                                            Intent.ACTION_VIEW,
+                                            gmmIntentUri
+                                        )
+
+                                    mapIntent.setPackage(
+                                        "com.google.android.apps.maps"
+                                    )
+
+                                    startActivity(mapIntent)
+
+                                } else {
+
+                                    Toast.makeText(
+                                        container.context,
+                                        "Endereço não disponível",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
-                        }
 
-                        // ➕ ADICIONAR NA TELA
-                        container.addView(itemView)
+                            // IMAGEM
+                            if (!item.imageUrl.isNullOrEmpty()) {
+
+                                Glide.with(container.context)
+                                    .load(item.imageUrl)
+                                    .into(imageView)
+
+                            } else if (!item.base64Image.isNullOrEmpty()) {
+
+                                try {
+
+                                    val bytes =
+                                        Base64.decode(
+                                            item.base64Image,
+                                            Base64.DEFAULT
+                                        )
+
+                                    val bitmap =
+                                        BitmapFactory.decodeByteArray(
+                                            bytes,
+                                            0,
+                                            bytes.size
+                                        )
+
+                                    imageView.setImageBitmap(bitmap)
+
+                                } catch (e: Exception) {
+
+                                    e.printStackTrace()
+                                }
+                            }
+
+                            // ADICIONAR NA TELA
+                            container.addView(itemView)
+                        }
                     }
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(container.context, "Erro ao carregar dados", Toast.LENGTH_SHORT).show()
+                override fun onCancelled(error: DatabaseError) {
+
+                    Toast.makeText(
+                        container.context,
+                        "Erro ao carregar dados",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
-        })
+        )
     }
 }
